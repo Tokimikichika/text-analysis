@@ -121,4 +121,22 @@ class TextAnalyzer
         
         return array_slice($wordCounts, 0, $limit, true);
     }
+    
+    /**
+     * Форматирует топ слов для frontend
+     * 
+     * @param array $topWords Ассоциативный массив слов и их количества
+     * @return array Массив объектов с полями word и count
+     */
+    public function formatTopWords(array $topWords): array
+    {
+        $formatted = [];
+        foreach ($topWords as $word => $count) {
+            $formatted[] = [
+                'word' => $word,
+                'count' => $count
+            ];
+        }
+        return $formatted;
+    }
 }
