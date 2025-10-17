@@ -57,4 +57,68 @@ class TextAnalyzer
         $paragraphs = preg_split('/\n{2,}|\r\n{2,}/u', trim($text), -1, PREG_SPLIT_NO_EMPTY);
         return $paragraphs ? count($paragraphs) : 0;
     }
+
+    /**
+     * Вычисляет среднюю длину слова
+     * 
+     * @param string $text Текст для анализа
+     * @return float Средняя длина слова
+     */
+    public function calculateAverageWordLength(string $text): float
+    {
+        $words = preg_split('/[\s\r\n\t]+/u', trim($text), -1, PREG_SPLIT_NO_EMPTY);
+        if (empty($words)) {
+            return 0.0;
+        }
+        
+        $totalLength = 0;
+        foreach ($words as $word) {
+            $totalLength += mb_strlen($word);
+        }
+        
+        return round($totalLength / count($words), 2);
+    }
+    
+    /**
+     * Вычисляет среднюю длину предложения
+     * 
+     * @param string $text Текст для анализа
+     * @return float Средняя длина предложения
+     */
+    public function calculateAverageSentenceLength(string $text): float
+    {
+        $sentences = preg_split('/[.!?]+(?:\s+|$)/u', trim($text), -1, PREG_SPLIT_NO_EMPTY);
+        if (empty($sentences)) {
+            return 0.0;
+        }
+        
+        $totalWords = 0;
+        foreach ($sentences as $sentence) {
+            $words = preg_split('/[\s\r\n\t]+/u', trim($sentence), -1, PREG_SPLIT_NO_EMPTY);
+            $totalWords += count($words);
+        }
+        
+        return round($totalWords / count($sentences), 2);
+    }
+    
+    /**
+     * Получает топ слов
+     * 
+     * @param string $text Текст для анализа
+     * @param int $limit Количество топ слов
+     * @return array Топ слов с количеством
+     */
+    public function getTopWords(string $text, int $limit = 5): array
+    {
+        $words = preg_split('/[\s\r\n\t]+/u', trim($text), -1, PREG_SPLIT_NO_EMPTY);
+        $words = array_map('mb_strtolower', $words);
+        $words = array_filter($words, function($word) {
+            return mb_strlen($word) > 2; // Исключаем короткие слова
+        });
+        
+        $wordCounts = array_count_values($words);
+        arsort($wordCounts);
+        
+        return array_slice($wordCounts, 0, $limit, true);
+    }
 }
